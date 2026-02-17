@@ -82,10 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 drawSelect.appendChild(option);
             });
 
-            statusMessage.textContent = 'Ready! Select a groovy draw.';
+            statusMessage.textContent = 'Select a draw to view winners.';
         } catch (error) {
             console.error(error);
-            statusMessage.textContent = `Bummer! ${error.message}`;
+            statusMessage.textContent = `Error: ${error.message}`;
         }
     }
 
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchWinners(drawId) {
         if (!drawId) return;
 
-        statusMessage.textContent = `Digging for winners of draw #${drawId}...`;
+        statusMessage.textContent = `Loading winners for draw #${drawId}...`;
         statusMessage.style.display = 'block';
         winnersTable.style.display = 'none';
         tableBody.innerHTML = '';
