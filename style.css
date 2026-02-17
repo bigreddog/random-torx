@@ -1,0 +1,190 @@
+@import url('https://fonts.googleapis.com/css2?family=Bungee+Outline&family=VT323&family=Yellowtail&display=swap');
+
+:root {
+    --bg-color: #fef9e7;
+    --text-color: #5d4037;
+    --gold: #e1ad01;
+    --orange: #bf5700;
+    --green: #568203;
+    --cream: #fffdd0;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'VT323', monospace;
+    margin: 0;
+    padding: 10px;
+    background-image: radial-gradient(var(--cream) 20%, transparent 20%),
+                      radial-gradient(var(--cream) 20%, transparent 20%);
+    background-size: 40px 40px;
+    background-position: 0 0, 20px 20px;
+    line-height: 1.4;
+}
+
+.crt-overlay {
+    display: none; /* Removed for 70s style */
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    border: 8px solid var(--text-color);
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 40px;
+    box-shadow: 15px 15px 0px var(--gold);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 5px solid var(--orange);
+    padding-bottom: 10px;
+}
+
+.title {
+    font-family: 'Bungee Outline', cursive;
+    color: var(--orange);
+    font-size: 3rem;
+    margin: 0;
+    text-shadow: 3px 3px 0px var(--gold);
+    letter-spacing: 2px;
+}
+
+.subtitle {
+    font-family: 'Yellowtail', cursive;
+    color: var(--green);
+    font-size: 1.8rem;
+    margin-top: -5px;
+    transform: rotate(-2deg);
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: var(--gold);
+    border-radius: 20px;
+    border: 4px solid var(--text-color);
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+label {
+    color: var(--text-color);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+input, select, button {
+    background-color: #fff;
+    color: var(--text-color);
+    border: 3px solid var(--text-color);
+    padding: 10px;
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    outline: none;
+}
+
+select:disabled {
+    opacity: 0.5;
+    background-color: #eee;
+}
+
+.table-container {
+    overflow-x: auto;
+    border: 4px solid var(--green);
+    border-radius: 20px;
+    background-color: #fff;
+    box-shadow: inset 5px 5px 10px rgba(0,0,0,0.1);
+}
+
+#status-message {
+    padding: 20px;
+    text-align: center;
+    font-size: 1.4rem;
+    color: var(--orange);
+    font-weight: bold;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background-color: var(--green);
+    color: #fff;
+    padding: 12px;
+    text-align: left;
+    font-size: 1.2rem;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 2px solid var(--cream);
+    font-size: 1.1rem;
+}
+
+tr:nth-child(even) {
+    background-color: var(--bg-color);
+}
+
+tr:hover {
+    background-color: var(--gold);
+    color: #fff;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .title {
+        font-size: 2rem;
+    }
+
+    .subtitle {
+        font-size: 1.4rem;
+    }
+
+    .container {
+        padding: 10px;
+        border-width: 4px;
+        border-radius: 20px;
+    }
+
+    th, td {
+        padding: 8px 4px;
+        font-size: 0.9rem;
+    }
+
+    /* Stack controls on mobile */
+    .controls {
+        padding: 10px;
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--cream);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--orange);
+    border: 3px solid var(--cream);
+    border-radius: 10px;
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random.org Draw Viewer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="crt-overlay"></div>
+    <div class="container">
+        <header>
+            <h1 class="title">RANDOM DRAWS</h1>
+            <p class="subtitle">TORX&reg; eXperience Data Explorer</p>
+        </header>
+
+        <section class="controls">
+            <div class="control-group">
+                <label for="draw-select">SELECT DRAW:</label>
+                <select id="draw-select">
+                    <option value="">-- Loading Draws... --</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="country-filter">FILTER BY COUNTRY:</label>
+                <select id="country-filter" disabled>
+                    <option value="">All Countries</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="table-container">
+            <div id="status-message">Loading owner records...</div>
+            <table id="winners-table" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>PLACE</th>
+                        <th>LAST NAME</th>
+                        <th>FIRST NAME</th>
+                        <th>GENDER</th>
+                        <th>CAT</th>
+                        <th>COUNTRY</th>
+                        <th>EVENT</th>
+                        <th>REG ID</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                </tbody>
+            </table>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
