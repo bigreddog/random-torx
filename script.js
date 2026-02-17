@@ -22,7 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
         'ar': 'Argentina', 'mx': 'Mexico', 'co': 'Colombia', 'cl': 'Chile',
         'hk': 'Hong Kong', 'tw': 'Taiwan', 'kr': 'South Korea', 'my': 'Malaysia',
         'sg': 'Singapore', 'th': 'Thailand', 'vn': 'Vietnam', 'id': 'Indonesia',
-        'in': 'India', 'ae': 'UAE', 'il': 'Israel'
+        'in': 'India', 'ae': 'UAE', 'il': 'Israel', 'ad': 'Andorra', 'ee': 'Estonia',
+        'lv': 'Latvia', 'lt': 'Lithuania', 'lu': 'Luxembourg', 'cy': 'Cyprus',
+        'is': 'Iceland', 'mt': 'Malta', 'mc': 'Monaco', 'li': 'Liechtenstein',
+        'sm': 'San Marino', 'va': 'Vatican City', 'ua': 'Ukraine', 'by': 'Belarus',
+        'md': 'Moldova', 'ge': 'Georgia', 'am': 'Armenia', 'az': 'Azerbaijan',
+        'kz': 'Kazakhstan', 'uz': 'Uzbekistan', 'tm': 'Turkmenistan', 'kg': 'Kyrgyzstan',
+        'tj': 'Tajikistan'
     };
 
     function getCountryName(code) {
@@ -31,9 +37,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return countryMap[lowerCode] || code.toUpperCase();
     }
 
+    function isCountryCode(val) {
+        if (!val || val.length !== 2) return false;
+        return countryMap.hasOwnProperty(val.toLowerCase());
+    }
+
     // Fetch draw list from Random.org
     async function fetchDrawList(ownerId) {
-        statusMessage.textContent = `Initializing data for owner ${ownerId}...`;
+        statusMessage.textContent = `Finding draws for owner ${ownerId}...`;
         drawSelect.innerHTML = '<option value="">-- Select a Draw --</option>';
         winnersTable.style.display = 'none';
 
@@ -60,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }).filter(Boolean);
 
             if (draws.length === 0) {
-                statusMessage.textContent = 'No draws found for this owner.';
+                statusMessage.textContent = 'No draws found.';
                 return;
             }
 
@@ -71,10 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 drawSelect.appendChild(option);
             });
 
-            statusMessage.textContent = 'Data ready. Select a draw to begin.';
+            statusMessage.textContent = 'Ready! Select a groovy draw.';
         } catch (error) {
             console.error(error);
-            statusMessage.textContent = `Error: ${error.message}. Please check your connection.`;
+            statusMessage.textContent = `Bummer! ${error.message}`;
         }
     }
 
@@ -82,13 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchWinners(drawId) {
         if (!drawId) return;
 
-        statusMessage.textContent = `Retrieving winners for draw #${drawId}...`;
+        statusMessage.textContent = `Digging for winners of draw #${drawId}...`;
         statusMessage.style.display = 'block';
         winnersTable.style.display = 'none';
         tableBody.innerHTML = '';
         allWinners = [];
 
-        // Reset country filter
         countryFilter.innerHTML = '<option value="">All Countries</option>';
         countryFilter.disabled = true;
 
@@ -101,18 +111,63 @@ document.addEventListener('DOMContentLoaded', () => {
             const lines = csvText.trim().split('\n');
 
             allWinners = lines.map(line => {
-                const cols = line.split(',');
-                return {
+                // Robust CSV split that handles quotes
+                const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/^"|"$/g, '').trim());
+                if (cols.length < 3) return null;
+
+                // Guess mapping by finding country code
+                let countryIdx = -1;
+                for (let i = 1; i < cols.length; i++) {
+                    if (isCountryCode(cols[i])) {
+                        countryIdx = i;
+                        break;
+                    }
+                }
+
+                let winner = {
                     place: cols[0],
-                    lastName: cols[1],
-                    firstName: cols[2],
-                    gender: cols[3],
-                    category: cols[4],
-                    country: cols[5],
-                    event: cols[6],
-                    regId: cols[7]
+                    lastName: '',
+                    firstName: '',
+                    gender: '',
+                    category: '',
+                    country: '',
+                    event: '',
+                    regId: ''
                 };
-            });
+
+                // The Random.org draw formats have evolved over time.
+                // We use the country column index as an anchor.
+                if (countryIdx === 3) {
+                    // Early format (e.g. some 2017 sub-draws)
+                    winner.lastName = cols[1];
+                    winner.firstName = cols[2];
+                    winner.country = cols[3];
+                    winner.regId = cols[cols.length - 1];
+                } else if (countryIdx === 4) {
+                    // 2017-2019 format: Rank, DrawName, LastName, FirstName, Country, RegID
+                    winner.lastName = cols[2];
+                    winner.firstName = cols[3];
+                    winner.country = cols[4];
+                    winner.regId = cols[cols.length - 1];
+                } else if (countryIdx === 5) {
+                    // 2020-2025 format: Rank, LastName, FirstName, Gender, Cat, Country, Event, RegID
+                    winner.lastName = cols[1];
+                    winner.firstName = cols[2];
+                    winner.gender = cols[3];
+                    winner.category = cols[4];
+                    winner.country = cols[5];
+                    winner.event = cols[6];
+                    winner.regId = cols[7];
+                } else if (countryIdx > 0) {
+                    // Generic fallback
+                    winner.country = cols[countryIdx];
+                    winner.lastName = cols[countryIdx - 2] || '';
+                    winner.firstName = cols[countryIdx - 1] || '';
+                    winner.regId = cols[cols.length - 1];
+                }
+
+                return winner;
+            }).filter(Boolean);
 
             populateCountryDropdown(allWinners);
             renderTable(allWinners);
@@ -157,10 +212,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 winner.place,
                 winner.lastName,
                 winner.firstName,
-                winner.gender,
-                winner.category,
+                winner.gender || '-',
+                winner.category || '-',
                 getCountryName(winner.country),
-                winner.event,
+                winner.event || '-',
                 winner.regId
             ];
 
