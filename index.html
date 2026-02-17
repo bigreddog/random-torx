@@ -16,19 +16,16 @@
 
         <section class="controls">
             <div class="control-group">
-                <label for="owner-select">OWNER ID:</label>
-                <input type="text" id="owner-id" value="10611">
-                <button id="load-draws">LOAD</button>
-            </div>
-            <div class="control-group">
                 <label for="draw-select">SELECT DRAW:</label>
                 <select id="draw-select">
-                    <option value="">-- Select a Draw --</option>
+                    <option value="">-- Loading Draws... --</option>
                 </select>
             </div>
             <div class="control-group">
-                <label for="country-filter">FILTER COUNTRY:</label>
-                <input type="text" id="country-filter" placeholder="e.g. it, fr, us..." maxlength="2">
+                <label for="country-filter">FILTER BY COUNTRY:</label>
+                <select id="country-filter" disabled>
+                    <option value="">All Countries</option>
+                </select>
             </div>
         </section>
 

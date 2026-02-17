@@ -1,17 +1,39 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const ownerIdInput = document.getElementById('owner-id');
-    const loadDrawsButton = document.getElementById('load-draws');
     const drawSelect = document.getElementById('draw-select');
     const statusMessage = document.getElementById('status-message');
     const winnersTable = document.getElementById('winners-table');
     const tableBody = document.getElementById('table-body');
     const countryFilter = document.getElementById('country-filter');
 
+    const FIXED_OWNER_ID = '10611';
     let allWinners = [];
+
+    // Country code to name mapping
+    const countryMap = {
+        'it': 'Italy', 'fr': 'France', 'es': 'Spain', 'de': 'Germany',
+        'gb': 'United Kingdom', 'us': 'USA', 'ca': 'Canada', 'ch': 'Switzerland',
+        'at': 'Austria', 'be': 'Belgium', 'nl': 'Netherlands', 'jp': 'Japan',
+        'cn': 'China', 'ru': 'Russia', 'gr': 'Greece', 'pt': 'Portugal',
+        'ie': 'Ireland', 'se': 'Sweden', 'no': 'Norway', 'fi': 'Finland',
+        'dk': 'Denmark', 'pl': 'Poland', 'cz': 'Czech Republic', 'sk': 'Slovakia',
+        'hu': 'Hungary', 'ro': 'Romania', 'bg': 'Bulgaria', 'hr': 'Croatia',
+        'si': 'Slovenia', 'rs': 'Serbia', 'mk': 'North Macedonia', 'tr': 'Turkey',
+        'au': 'Australia', 'nz': 'New Zealand', 'za': 'South Africa', 'br': 'Brazil',
+        'ar': 'Argentina', 'mx': 'Mexico', 'co': 'Colombia', 'cl': 'Chile',
+        'hk': 'Hong Kong', 'tw': 'Taiwan', 'kr': 'South Korea', 'my': 'Malaysia',
+        'sg': 'Singapore', 'th': 'Thailand', 'vn': 'Vietnam', 'id': 'Indonesia',
+        'in': 'India', 'ae': 'UAE', 'il': 'Israel'
+    };
+
+    function getCountryName(code) {
+        if (!code) return 'Unknown';
+        const lowerCode = code.toLowerCase();
+        return countryMap[lowerCode] || code.toUpperCase();
+    }
 
     // Fetch draw list from Random.org
     async function fetchDrawList(ownerId) {
-        statusMessage.textContent = `Fetching draws for owner ${ownerId}...`;
+        statusMessage.textContent = `Initializing data for owner ${ownerId}...`;
         drawSelect.innerHTML = '<option value="">-- Select a Draw --</option>';
         winnersTable.style.display = 'none';
 
@@ -29,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const link = row.querySelector('a[href*="draw="]');
                 if (!link) return null;
 
-                // Extract draw ID from href
                 const href = link.getAttribute('href');
                 const match = href.match(/draw=(\d+)/);
                 const id = match ? match[1] : null;
@@ -50,26 +71,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 drawSelect.appendChild(option);
             });
 
-            statusMessage.textContent = 'Draws loaded. Please select one below.';
+            statusMessage.textContent = 'Data ready. Select a draw to begin.';
         } catch (error) {
             console.error(error);
-            statusMessage.textContent = `Error: ${error.message}. Make sure CORS is allowed.`;
+            statusMessage.textContent = `Error: ${error.message}. Please check your connection.`;
         }
     }
-
-    loadDrawsButton.addEventListener('click', () => {
-        fetchDrawList(ownerIdInput.value.trim());
-    });
 
     // Fetch and parse CSV winners list
     async function fetchWinners(drawId) {
         if (!drawId) return;
 
-        statusMessage.textContent = `Fetching winners for draw #${drawId}...`;
+        statusMessage.textContent = `Retrieving winners for draw #${drawId}...`;
         statusMessage.style.display = 'block';
         winnersTable.style.display = 'none';
         tableBody.innerHTML = '';
         allWinners = [];
+
+        // Reset country filter
+        countryFilter.innerHTML = '<option value="">All Countries</option>';
+        countryFilter.disabled = true;
 
         try {
             const url = `https://www.random.org/draws/download/?draw=${drawId}&file=winners&format=csv`;
@@ -81,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             allWinners = lines.map(line => {
                 const cols = line.split(',');
-                // CSV structure: Place, LastName, FirstName, Gender, Category, Country, Event, ID
                 return {
                     place: cols[0],
                     lastName: cols[1],
@@ -94,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             });
 
+            populateCountryDropdown(allWinners);
             renderTable(allWinners);
             statusMessage.style.display = 'none';
             winnersTable.style.display = 'table';
@@ -103,42 +124,70 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function populateCountryDropdown(winners) {
+        const countries = new Set();
+        winners.forEach(w => {
+            if (w.country) countries.add(w.country.toLowerCase());
+        });
+
+        const sortedCountries = Array.from(countries).sort((a, b) => {
+            const nameA = getCountryName(a);
+            const nameB = getCountryName(b);
+            return nameA.localeCompare(nameB);
+        });
+
+        sortedCountries.forEach(code => {
+            const option = document.createElement('option');
+            option.value = code;
+            option.textContent = `${getCountryName(code)} (${code.toUpperCase()})`;
+            countryFilter.appendChild(option);
+        });
+
+        if (sortedCountries.length > 0) {
+            countryFilter.disabled = false;
+        }
+    }
+
     function renderTable(data) {
         tableBody.innerHTML = '';
         data.forEach(winner => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${winner.place}</td>
-                <td>${winner.lastName}</td>
-                <td>${winner.firstName}</td>
-                <td>${winner.gender}</td>
-                <td>${winner.category}</td>
-                <td>${winner.country}</td>
-                <td>${winner.event}</td>
-                <td>${winner.regId}</td>
-            `;
-            tableBody.appendChild(row);
+            const row = tableBody.insertRow();
+
+            const fields = [
+                winner.place,
+                winner.lastName,
+                winner.firstName,
+                winner.gender,
+                winner.category,
+                getCountryName(winner.country),
+                winner.event,
+                winner.regId
+            ];
+
+            fields.forEach(text => {
+                const cell = row.insertCell();
+                cell.textContent = text || '';
+            });
         });
     }
 
     drawSelect.addEventListener('change', () => {
         fetchWinners(drawSelect.value);
-        countryFilter.value = '';
     });
 
-    countryFilter.addEventListener('input', () => {
-        const filterValue = countryFilter.value.toLowerCase().trim();
+    countryFilter.addEventListener('change', () => {
+        const filterValue = countryFilter.value;
         if (!filterValue) {
             renderTable(allWinners);
             return;
         }
 
         const filtered = allWinners.filter(winner =>
-            winner.country && winner.country.toLowerCase().includes(filterValue)
+            winner.country && winner.country.toLowerCase() === filterValue
         );
         renderTable(filtered);
     });
 
     // Initial load
-    fetchDrawList('10611');
+    fetchDrawList(FIXED_OWNER_ID);
 });
