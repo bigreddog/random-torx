@@ -85,6 +85,26 @@ document.addEventListener('DOMContentLoaded', () => {
         countryFilter.disabled = true;
 
         try {
+            // Fetch extra data for 2026 draw if needed
+            let extraDataLookup = null;
+            if (drawId === '285707') {
+                try {
+                    const apiResponse = await fetch('https://torxtrail.beebeeboard.com/api/v1/vdatrailers/iscritti_gara/1595');
+                    if (apiResponse.ok) {
+                        const jsonData = await apiResponse.json();
+                        if (jsonData.iscritti) {
+                            extraDataLookup = new Map();
+                            jsonData.iscritti.forEach(item => {
+                                const key = `${(item.cognome || '').trim().toUpperCase()}|${(item.nome || '').trim().toUpperCase()}`;
+                                extraDataLookup.set(key, item.nazione);
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch extra data for cross-reference", e);
+                }
+            }
+
             const url = `https://www.random.org/draws/download/?draw=${drawId}&file=winners&format=csv`;
             const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to fetch winners CSV');
@@ -158,6 +178,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Bare minimum fallback
                         winner.lastName = cols[1] || '';
                         winner.firstName = cols[2] || '';
+                    }
+                }
+
+                // Cross-reference with extra data if available (e.g. 2026)
+                if (extraDataLookup) {
+                    const key = `${winner.lastName.trim().toUpperCase()}|${winner.firstName.trim().toUpperCase()}`;
+                    if (extraDataLookup.has(key)) {
+                        winner.country = extraDataLookup.get(key);
                     }
                 }
 
