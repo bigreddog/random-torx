@@ -8,27 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const FIXED_OWNER_ID = '10611';
     let allWinners = [];
 
-    // Country code to name mapping
+    // Country code to name mapping (ISO 3166-1 alpha-2)
     const countryMap = {
-        'it': 'Italy', 'fr': 'France', 'es': 'Spain', 'de': 'Germany',
-        'gb': 'United Kingdom', 'us': 'USA', 'ca': 'Canada', 'ch': 'Switzerland',
-        'at': 'Austria', 'be': 'Belgium', 'nl': 'Netherlands', 'jp': 'Japan',
-        'cn': 'China', 'ru': 'Russia', 'gr': 'Greece', 'pt': 'Portugal',
-        'ie': 'Ireland', 'se': 'Sweden', 'no': 'Norway', 'fi': 'Finland',
-        'dk': 'Denmark', 'pl': 'Poland', 'cz': 'Czech Republic', 'sk': 'Slovakia',
-        'hu': 'Hungary', 'ro': 'Romania', 'bg': 'Bulgaria', 'hr': 'Croatia',
-        'si': 'Slovenia', 'rs': 'Serbia', 'mk': 'North Macedonia', 'tr': 'Turkey',
-        'au': 'Australia', 'nz': 'New Zealand', 'za': 'South Africa', 'br': 'Brazil',
-        'ar': 'Argentina', 'mx': 'Mexico', 'co': 'Colombia', 'cl': 'Chile',
-        'hk': 'Hong Kong', 'tw': 'Taiwan', 'kr': 'South Korea', 'my': 'Malaysia',
-        'sg': 'Singapore', 'th': 'Thailand', 'vn': 'Vietnam', 'id': 'Indonesia',
-        'in': 'India', 'ae': 'UAE', 'il': 'Israel', 'ad': 'Andorra', 'ee': 'Estonia',
-        'lv': 'Latvia', 'lt': 'Lithuania', 'lu': 'Luxembourg', 'cy': 'Cyprus',
-        'is': 'Iceland', 'mt': 'Malta', 'mc': 'Monaco', 'li': 'Liechtenstein',
-        'sm': 'San Marino', 'va': 'Vatican City', 'ua': 'Ukraine', 'by': 'Belarus',
-        'md': 'Moldova', 'ge': 'Georgia', 'am': 'Armenia', 'az': 'Azerbaijan',
-        'kz': 'Kazakhstan', 'uz': 'Uzbekistan', 'tm': 'Turkmenistan', 'kg': 'Kyrgyzstan',
-        'tj': 'Tajikistan'
+        'af': 'Afghanistan', 'ax': 'Åland Islands', 'al': 'Albania', 'dz': 'Algeria', 'as': 'American Samoa', 'ad': 'Andorra', 'ao': 'Angola', 'ai': 'Anguilla', 'aq': 'Antarctica', 'ag': 'Antigua and Barbuda', 'ar': 'Argentina', 'am': 'Armenia', 'aw': 'Aruba', 'au': 'Australia', 'at': 'Austria', 'az': 'Azerbaijan', 'bs': 'Bahamas', 'bh': 'Bahrain', 'bd': 'Bangladesh', 'bb': 'Barbados', 'by': 'Belarus', 'be': 'Belgium', 'bz': 'Belize', 'bj': 'Benin', 'bm': 'Bermuda', 'bt': 'Bhutan', 'bo': 'Bolivia', 'bq': 'Bonaire', 'ba': 'Bosnia and Herzegovina', 'bw': 'Botswana', 'bv': 'Bouvet Island', 'br': 'Brazil', 'io': 'British Indian Ocean Territory', 'bn': 'Brunei Darussalam', 'bg': 'Bulgaria', 'bf': 'Burkina Faso', 'bi': 'Burundi', 'cv': 'Cabo Verde', 'kh': 'Cambodia', 'cm': 'Cameroon', 'ca': 'Canada', 'ky': 'Cayman Islands', 'cf': 'Central African Republic', 'td': 'Chad', 'cl': 'Chile', 'cn': 'China', 'cx': 'Christmas Island', 'cc': 'Cocos (Keeling) Islands', 'co': 'Colombia', 'km': 'Comoros', 'cd': 'Congo (DRC)', 'cg': 'Congo (Republic)', 'ck': 'Cook Islands', 'cr': 'Costa Rica', 'ci': 'Côte d\'Ivoire', 'hr': 'Croatia', 'cu': 'Cuba', 'cw': 'Curaçao', 'cy': 'Cyprus', 'cz': 'Czech Republic', 'dk': 'Denmark', 'dj': 'Djibouti', 'dm': 'Dominica', 'do': 'Dominican Republic', 'ec': 'Ecuador', 'eg': 'Egypt', 'sv': 'El Salvador', 'gq': 'Equatorial Guinea', 'er': 'Eritrea', 'ee': 'Estonia', 'sz': 'Eswatini', 'et': 'Ethiopia', 'fk': 'Falkland Islands', 'fo': 'Faroe Islands', 'fj': 'Fiji', 'fi': 'Finland', 'fr': 'France', 'gf': 'French Guiana', 'pf': 'French Polynesia', 'tf': 'French Southern Territories', 'ga': 'Gabon', 'gm': 'Gambia', 'ge': 'Georgia', 'de': 'Germany', 'gh': 'Ghana', 'gi': 'Gibraltar', 'gr': 'Greece', 'gl': 'Greenland', 'gd': 'Grenada', 'gp': 'Guadeloupe', 'gu': 'Guam', 'gt': 'Guatemala', 'gg': 'Guernsey', 'gn': 'Guinea', 'gw': 'Guinea-Bissau', 'gy': 'Guyana', 'ht': 'Haiti', 'hm': 'Heard Island and McDonald Islands', 'va': 'Vatican City', 'hn': 'Honduras', 'hk': 'Hong Kong', 'hu': 'Hungary', 'is': 'Iceland', 'in': 'India', 'id': 'Indonesia', 'ir': 'Iran', 'iq': 'Iraq', 'ie': 'Ireland', 'im': 'Isle of Man', 'il': 'Israel', 'it': 'Italy', 'jm': 'Jamaica', 'jp': 'Japan', 'je': 'Jersey', 'jo': 'Jordan', 'kz': 'Kazakhstan', 'ke': 'Kenya', 'ki': 'Kiribati', 'kp': 'North Korea', 'kr': 'South Korea', 'kw': 'Kuwait', 'kg': 'Kyrgyzstan', 'la': 'Laos', 'lv': 'Latvia', 'lb': 'Lebanon', 'ls': 'Lesotho', 'lr': 'Liberia', 'ly': 'Libya', 'li': 'Liechtenstein', 'lt': 'Lithuania', 'lu': 'Luxembourg', 'mo': 'Macao', 'mg': 'Madagascar', 'mw': 'Malawi', 'my': 'Malaysia', 'mv': 'Maldives', 'ml': 'Mali', 'mt': 'Malta', 'mh': 'Marshall Islands', 'mq': 'Martinique', 'mr': 'Mauritania', 'mu': 'Mauritius', 'yt': 'Mayotte', 'mx': 'Mexico', 'fm': 'Micronesia', 'md': 'Moldova', 'mc': 'Monaco', 'mn': 'Mongolia', 'me': 'Montenegro', 'ms': 'Montserrat', 'ma': 'Morocco', 'mz': 'Mozambique', 'mm': 'Myanmar', 'na': 'Namibia', 'nr': 'Nauru', 'np': 'Nepal', 'nl': 'Netherlands', 'nc': 'New Caledonia', 'nz': 'New Zealand', 'ni': 'Nicaragua', 'ne': 'Niger', 'ng': 'Nigeria', 'nu': 'Niue', 'nf': 'Norfolk Island', 'mp': 'Northern Mariana Islands', 'no': 'Norway', 'om': 'Oman', 'pk': 'Pakistan', 'pw': 'Palau', 'ps': 'Palestine', 'pa': 'Panama', 'pg': 'Papua New Guinea', 'py': 'Paraguay', 'pe': 'Peru', 'ph': 'Philippines', 'pn': 'Pitcairn', 'pl': 'Poland', 'pt': 'Portugal', 'pr': 'Puerto Rico', 'qa': 'Qatar', 're': 'Réunion', 'ro': 'Romania', 'ru': 'Russia', 'rw': 'Rwanda', 'bl': 'Saint Barthélemy', 'sh': 'Saint Helena', 'kn': 'Saint Kitts and Nevis', 'lc': 'Saint Lucia', 'mf': 'Saint Martin', 'pm': 'Saint Pierre and Miquelon', 'vc': 'Saint Vincent and the Grenadines', 'ws': 'Samoa', 'sm': 'San Marino', 'st': 'Sao Tome and Principe', 'sa': 'Saudi Arabia', 'sn': 'Senegal', 'rs': 'Serbia', 'sc': 'Seychelles', 'sl': 'Sierra Leone', 'sg': 'Singapore', 'sx': 'Sint Maarten', 'sk': 'Slovakia', 'si': 'Slovenia', 'sb': 'Solomon Islands', 'so': 'Somalia', 'za': 'South Africa', 'gs': 'South Georgia and the South Sandwich Islands', 'ss': 'South Sudan', 'es': 'Spain', 'lk': 'Sri Lanka', 'sd': 'Sudan', 'sr': 'Suriname', 'sj': 'Svalbard and Jan Mayen', 'se': 'Sweden', 'ch': 'Switzerland', 'sy': 'Syria', 'tw': 'Taiwan', 'tj': 'Tajikistan', 'tz': 'Tanzania', 'th': 'Thailand', 'tl': 'Timor-Leste', 'tg': 'Togo', 'tk': 'Tokelau', 'to': 'Tonga', 'tt': 'Trinidad and Tobago', 'tn': 'Tunisia', 'tr': 'Turkey', 'tm': 'Turkmenistan', 'tc': 'Turks and Caicos Islands', 'tv': 'Tuvalu', 'ug': 'Uganda', 'ua': 'Ukraine', 'ae': 'United Arab Emirates', 'gb': 'United Kingdom', 'um': 'United States Minor Outlying Islands', 'us': 'United States', 'uy': 'Uruguay', 'uz': 'Uzbekistan', 'vu': 'Vanuatu', 've': 'Venezuela', 'vn': 'Vietnam', 'vg': 'British Virgin Islands', 'vi': 'U.S. Virgin Islands', 'wf': 'Wallis and Futuna', 'eh': 'Western Sahara', 'ye': 'Yemen', 'zm': 'Zambia', 'zw': 'Zimbabwe'
     };
 
     function getCountryName(code) {
@@ -115,6 +97,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/^"|"$/g, '').trim());
                 if (cols.length < 3) return null;
 
+                // Skip header row if present
+                if (isNaN(parseInt(cols[0]))) return null;
+
                 // Guess mapping by finding country code
                 let countryIdx = -1;
                 for (let i = 1; i < cols.length; i++) {
@@ -132,38 +117,48 @@ document.addEventListener('DOMContentLoaded', () => {
                     category: '',
                     country: '',
                     event: '',
-                    regId: ''
+                    regId: cols[cols.length - 1] // Default to last column
                 };
 
                 // The Random.org draw formats have evolved over time.
-                // We use the country column index as an anchor.
-                if (countryIdx === 3) {
-                    // Early format (e.g. some 2017 sub-draws)
-                    winner.lastName = cols[1];
-                    winner.firstName = cols[2];
-                    winner.country = cols[3];
-                    winner.regId = cols[cols.length - 1];
-                } else if (countryIdx === 4) {
-                    // 2017-2019 format: Rank, DrawName, LastName, FirstName, Country, RegID
-                    winner.lastName = cols[2];
-                    winner.firstName = cols[3];
-                    winner.country = cols[4];
-                    winner.regId = cols[cols.length - 1];
-                } else if (countryIdx === 5) {
-                    // 2020-2025 format: Rank, LastName, FirstName, Gender, Cat, Country, Event, RegID
-                    winner.lastName = cols[1];
-                    winner.firstName = cols[2];
-                    winner.gender = cols[3];
-                    winner.category = cols[4];
-                    winner.country = cols[5];
-                    winner.event = cols[6];
-                    winner.regId = cols[7];
-                } else if (countryIdx > 0) {
-                    // Generic fallback
+                // We use the country column index as an anchor if found.
+                if (countryIdx !== -1) {
                     winner.country = cols[countryIdx];
-                    winner.lastName = cols[countryIdx - 2] || '';
-                    winner.firstName = cols[countryIdx - 1] || '';
-                    winner.regId = cols[cols.length - 1];
+                    if (countryIdx === 3) {
+                        // 2024 format: Rank, Last, First, Country, RegID, ...
+                        winner.lastName = cols[1];
+                        winner.firstName = cols[2];
+                        winner.regId = cols[4];
+                    } else if (countryIdx === 4) {
+                        // 2017-2019 format: Rank, DrawName, LastName, FirstName, Country, RegID
+                        winner.lastName = cols[2];
+                        winner.firstName = cols[3];
+                    } else if (countryIdx === 5) {
+                        // 2020-2025 format: Rank, LastName, FirstName, Gender, Cat, Country, Event, RegID
+                        winner.lastName = cols[1];
+                        winner.firstName = cols[2];
+                        winner.gender = cols[3];
+                        winner.category = cols[4];
+                        winner.event = cols[6];
+                        winner.regId = cols[7];
+                    } else {
+                        // Generic fallback with country anchor
+                        winner.lastName = cols[countryIdx - 2] || '';
+                        winner.firstName = cols[countryIdx - 1] || '';
+                    }
+                } else {
+                    // No country found (e.g. 2026 format) - guess by column length
+                    if (cols.length === 6) {
+                        // 2026 format: Rank, Last, First, Gender, Cat, ID
+                        winner.lastName = cols[1];
+                        winner.firstName = cols[2];
+                        winner.gender = cols[3];
+                        winner.category = cols[4];
+                    } else {
+                        // Bare minimum fallback
+                        winner.lastName = cols[1] || '';
+                        winner.firstName = cols[2] || '';
+                    }
                 }
 
                 return winner;
